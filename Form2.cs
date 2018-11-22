@@ -18,11 +18,6 @@ namespace WindowsFormsChatter
             InitializeComponent();
         }
 
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //显示聊天记录其他内容
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             //将聊天内容通过服务器发送给在同一聊天室的其他客户端
@@ -57,31 +52,47 @@ namespace WindowsFormsChatter
             clh.Text = "聊天室" + chat_room_number.ToString();
             clh.Width = 220;
             listView1.Columns.Add(clh);
-            FileInfo fi;//
             try
             {
                 if (!Directory.Exists(@".\ChatLog"))//第一次时要先创建文件夹
                     Directory.CreateDirectory(@".\ChatLog");
                 else
                 {
-                    if (File.Exists(@".\ChatLog\Chat_Room_" + chat_room_number.ToString() + ".txt"))
-                        fi = new FileInfo(@".\ChatLog\Chat_Room_" + 
+                    FileInfo fi = new FileInfo(@".\ChatLog\Chat_Room_" +
                             chat_room_number.ToString() + ".txt");
-
+                    if (!fi.Exists)
+                    {
+                        fi.Create();
+                    }
+                    else
+                    {
+                        //fi.OpenRead()
+                        /*
+                         * 用FileStream对象读取文件并显示到listview中
+                         * 
+                         */
+                        StreamReader reader = new StreamReader(fi.OpenRead(),
+                            UnicodeEncoding.GetEncoding("GB2312"));
+                        string content = string.Empty;
+                        while((content = reader.ReadLine()) != null)
+                        {
+                            content = content.Trim().ToString();
+                            //进度线
+                            ListViewGroup grp = new ListViewGroup();
+                            grp.Header = "我";
+                            listView1.Groups.Add(grp);
+                            ListViewItem lvi = new ListViewItem();
+                            lvi.Text = "this is first message";
+                            lvi.Group = listView1.Groups[0];
+                            listView1.Items.Add(lvi);
+                        }
+                    }
                 }
-                ListViewGroup grp = new ListViewGroup();
-                grp.Header = "我";
-                listView1.Groups.Add(grp);
-                ListViewItem lvi = new ListViewItem();
-                lvi.Text = "this is first message";
-                lvi.Group = listView1.Groups[0];
-                listView1.Items.Add(lvi);
             }catch(Exception ex)
             {
                 System.Console.WriteLine(ex.Message);
             }
             //读取对应聊天室的聊天记录文件
         }
-       
     }
 }
