@@ -1,0 +1,10 @@
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\bin\Debug\WindowsFormsChatter.exe.config
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\bin\Debug\WindowsFormsChatter.exe
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\bin\Debug\WindowsFormsChatter.pdb
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.csprojResolveAssemblyReference.cache
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.Form1.resources
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.Properties.Resources.resources
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.csproj.GenerateResource.Cache
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.exe
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.pdb
+c:\users\jlurobot\documents\visual studio 2015\Projects\WindowsFormsChatter\WindowsFormsChatter\obj\Debug\WindowsFormsChatter.Form2.resources
