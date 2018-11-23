@@ -29,12 +29,13 @@ namespace WindowsFormsChatter
             {
                 IPAddress ip = IPAddress.Parse(textBox1.Text);
                 IPEndPoint point = new IPEndPoint(ip, int.Parse(textBox2.Text));
+                Console.WriteLine(point.Address.ToString() + "Connected");
                 client.Connect(point);
                 this.Hide();
                 Form2 form2 = new Form2();
-                Thread th = new Thread(form2.ReceiveMsg);
+                Thread th = new Thread(form2.receive_Msg);
                 th.IsBackground = true;
-                th.Start();
+                th.Start(client);
                 form2.Show();
             }
             catch(Exception ex)
