@@ -13,6 +13,7 @@ namespace WindowsFormsChatter
 {
     public partial class Form2 : Form
     {
+        int counter = 0;//统计消息条数
         public Form2()
         {
             InitializeComponent();
@@ -23,19 +24,45 @@ namespace WindowsFormsChatter
             //将聊天内容通过服务器发送给在同一聊天室的其他客户端
             //将聊天内容存放到对应的聊天室的文件中
         }
-        public void ReceiveMsg(object s)
+        public void ReceiveMsg(object obj)
         {
-            Socket client = s as Socket;
+            Socket client = obj as Socket;
             while (true)
             {
                 try
                 {
+                    if (comboBox1.Text == "")//未选择聊天室时不接收信息
+                        continue;
+                    else {
+                        int chat_room_number = int.Parse(this.comboBox1.Text.Substring//获取房间号
+                        (comboBox1.Text.Length - 1, 1));
+                    }
                     byte[] buffer = new byte[1024 * 1024];
                     int n = client.Receive(buffer);
-                    string words = Encoding.UTF8.GetString(buffer, 0, n);
-                    listView1.Items.Add(words);
-                    //解析数据并显示到listview中
-                }
+                    string content = Encoding.Unicode.GetString(buffer, 0, n);
+                    content = content.Trim().ToString();
+                    string[] s = content.Split('#', '$');
+                    ListViewGroup grp = new ListViewGroup();
+                    grp.Header = s[1];
+                    listView1.Groups.Add(grp);
+                    ListViewItem lvi = new ListViewItem();
+                    lvi.Text = s[s.Length - 2];
+                    lvi.Group = listView1.Groups[counter++];
+                    listView1.Items.Add(lvi);
+                    if (!Directory.Exists(@".\ChatLog"))//第一次时要先创建文件夹
+                        Directory.CreateDirectory(@".\ChatLog");
+                    else
+                    {
+                        FileInfo fi = new FileInfo(@".\ChatLog\Chat_Room_" +
+                                chat_room_number.ToString() + ".txt");
+                        if (!fi.Exists)
+                        {
+                            fi.Create();
+                        }
+                        else
+                        {
+                        }
+                     } 
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
@@ -66,24 +93,23 @@ namespace WindowsFormsChatter
                     }
                     else
                     {
-                        //fi.OpenRead()
                         /*
                          * 用FileStream对象读取文件并显示到listview中
-                         * 
                          */
                         StreamReader reader = new StreamReader(fi.OpenRead(),
-                            UnicodeEncoding.GetEncoding("GB2312"));
+                            UnicodeEncoding.GetEncoding("utf-16"));
                         string content = string.Empty;
+                        int counter = 0;//统计消息条数
                         while((content = reader.ReadLine()) != null)
                         {
                             content = content.Trim().ToString();
-                            //进度线
+                            string[] s = content.Split('#','$');
                             ListViewGroup grp = new ListViewGroup();
-                            grp.Header = "我";
+                            grp.Header = s[1];
                             listView1.Groups.Add(grp);
                             ListViewItem lvi = new ListViewItem();
-                            lvi.Text = "this is first message";
-                            lvi.Group = listView1.Groups[0];
+                            lvi.Text = s[s.Length - 2];
+                            lvi.Group = listView1.Groups[counter++];
                             listView1.Items.Add(lvi);
                         }
                     }

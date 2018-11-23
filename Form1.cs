@@ -22,17 +22,17 @@ namespace WindowsFormsChatter
         }
         private void button1_Click_1(object sender, EventArgs e)
         {
-            //临时测试
-            Form2 form2 = new Form2();
-            form2.Show();
+            ////临时测试
+            //Form2 form2 = new Form2();
+            //form2.Show();
             try
             {
                 IPAddress ip = IPAddress.Parse(textBox1.Text);
                 IPEndPoint point = new IPEndPoint(ip, int.Parse(textBox2.Text));
                 client.Connect(point);
                 this.Hide();
-               // Form2 form2 = new Form2();
-                Thread th = new Thread(form2.ReceiveMsg);//进度线
+                Form2 form2 = new Form2();
+                Thread th = new Thread(form2.ReceiveMsg);
                 th.IsBackground = true;
                 th.Start();
                 form2.Show();
