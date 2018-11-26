@@ -22,9 +22,6 @@ namespace WindowsFormsChatter
         }
         private void button1_Click_1(object sender, EventArgs e)
         {
-            ////临时测试
-            //Form2 form2 = new Form2();
-            //form2.Show();
             try
             {
                 IPAddress ip = IPAddress.Parse(textBox1.Text);
@@ -32,10 +29,10 @@ namespace WindowsFormsChatter
                 Console.WriteLine(point.Address.ToString() + "Connected");
                 client.Connect(point);
                 this.Hide();
-                Form2 form2 = new Form2();
+                Form2 form2 = new Form2(client);
                 Thread th = new Thread(form2.receive_Msg);
                 th.IsBackground = true;
-                th.Start(client);
+                th.Start();
                 form2.Show();
             }
             catch(Exception ex)

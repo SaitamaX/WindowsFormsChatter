@@ -10,21 +10,29 @@ using System.Net.Sockets;
 using System.IO;
 using System.Net;
 
+/********消息格式：
+ 
+# + 消息类型（0或1）+ $ + 消息发送人 + $ + 消息内容 + #
+
+eg:  "#0$127.0.0.1$hello world#"
+
+******************/
 namespace WindowsFormsChatter
 {
     public partial class Form2 : Form
     {
         int counter = 0;//统计消息条数
-        public Form2()
+        int room_number;//所在房间
+        Socket client;
+        public Form2(object obj)
         {
+            client = obj as Socket;
             InitializeComponent();
         }
-        private void show_Result(string str)
+        private void show_Result(string [] s)
         {
-            str = str.Trim().ToString();
-            string[] s = str.Split('#', '$');
             ListViewGroup grp = new ListViewGroup();
-            grp.Header = s[1];
+            grp.Header = s[2];
             listView1.Groups.Add(grp);
             ListViewItem lvi = new ListViewItem();
             lvi.Text = s[s.Length - 2];
@@ -34,8 +42,33 @@ namespace WindowsFormsChatter
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if(textBox1.Text == "")
+            {
+                return;//未输入时按动按钮无效
+            }
+            else
+            {
+                IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
+                byte[] buffer = Encoding.ASCII.GetBytes("#1$" + client_ip.Address.ToString()
+                    + "$" + textBox1.Text + "#");
+                client.Send(buffer);
+                string content = "#1$" + client_ip.Address.ToString()
+                    + "$" + textBox1.Text + "#";
+                string[] s = content.Split('#', '$');
+                show_Result(s);
+                if (!Directory.Exists(@".\ChatLog"))//存放该条内容到聊天记录中
+                    Directory.CreateDirectory(@".\ChatLog");
+                FileInfo fi = new FileInfo(@".\ChatLog\Chat_Room_" +
+                        room_number.ToString() + ".txt");
+                if (!fi.Exists)
+                {
+                    fi.Create();
+                }
+                StreamWriter writer = new StreamWriter(fi.ToString(),true);
+                writer.WriteLine("#1$" + client_ip.Address.ToString() + "$" + textBox1.Text + "#");
+                writer.Close();
+            }
             //将聊天内容通过服务器发送给在同一聊天室的其他客户端
-            //将聊天内容存放到对应的聊天室的文件中
         }
 
 
@@ -54,40 +87,40 @@ namespace WindowsFormsChatter
                 }
                 else
                 {
-                    int chat_room_number = int.Parse(this.comboBox1.Text.Substring(comboBox1.Text.Length - 1, 1));
-                    return chat_room_number;
+                    room_number = int.Parse(this.comboBox1.Text.Substring(comboBox1.Text.Length - 1, 1));
+                    return room_number;
                 }
             }
             return -1;
         }
 
 
-        public void receive_Msg(object obj)
+        public void receive_Msg()
         {
-            Socket client = obj as Socket;
-            int chat_room_number;
+            //Socket client = obj as Socket;
             while (true)
             {
                 try
                 {
-                    if ((chat_room_number = get_Number(comboBox1)) == -1) {
+                    if (get_Number(comboBox1) == -1) {
                         continue;
                     }
                     byte[] buffer = new byte[1024 * 1024];
-                    IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
                     int n = client.Receive(buffer);
-                    string content = Encoding.Unicode.GetString(buffer, 0, n);
-                    show_Result(content);
+                    string content = Encoding.ASCII.GetString(buffer, 0, n);
+                    content = content.Trim().ToString();
+                    string[] s = content.Split('#', '$');
+                    show_Result(s);//显示接收的消息
                     if (!Directory.Exists(@".\ChatLog"))//存放该条内容到聊天记录中
                         Directory.CreateDirectory(@".\ChatLog");
                     FileInfo fi = new FileInfo(@".\ChatLog\Chat_Room_" +
-                            chat_room_number.ToString() + ".txt");
+                            room_number.ToString() + ".txt");
                     if (!fi.Exists) { 
                         fi.Create();
                     }
-                    StreamWriter writer = new StreamWriter(fi.OpenRead(),
-                        UnicodeEncoding.GetEncoding("utf-16"));
-                    writer.WriteLine("#" + client_ip.ToString() + "$" + content + "#");
+                    StreamWriter writer = new StreamWriter(fi.ToString(), true);
+                    writer.WriteLine(content);
+                    writer.Close();
                 }
                 catch (Exception ex)
                 {
@@ -97,10 +130,22 @@ namespace WindowsFormsChatter
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)//
         {
-            int chat_room_number = int.Parse(this.comboBox1. Text.Substring//获取房间号
+            if (button1.Enabled)//非首次选择聊天室，清空输出区
+            {
+                listView1.Groups.Clear();
+                listView1.Items.Clear();
+                counter = 0;
+            }
+            button1.Enabled = true;//在选择了聊天室后才可发送信息
+            room_number = int.Parse(this.comboBox1.Text.Substring//获取房间号
                 (this.comboBox1.Text.Length - 1, 1));
+            IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
+            byte[] buffer = Encoding.ASCII.GetBytes("#0$" + client_ip.Address.ToString()
+                + "$" + room_number.ToString() + "#");
+            client.Send(buffer);
+            //变更了聊天室应先将聊天室信息发送给服务器
             ColumnHeader clh = new ColumnHeader();
             clh.Text = "欢迎进入聊天室";
             clh.Width = 220;
@@ -114,7 +159,7 @@ namespace WindowsFormsChatter
                 else
                 {
                     FileInfo fi = new FileInfo(@".\ChatLog\Chat_Room_" +
-                            chat_room_number.ToString() + ".txt");
+                            room_number.ToString() + ".txt");
                     if (!fi.Exists)//第一次进入此聊天室，创建txt文件即可
                     {
                         fi.Create();
@@ -124,11 +169,15 @@ namespace WindowsFormsChatter
                         /*
                          * 用FileStream对象读取文件并显示到listview中
                          */
-                        StreamReader reader = new StreamReader(fi.OpenRead(),
-                            UnicodeEncoding.GetEncoding("utf-16"));
-                        string content = string.Empty;
+                        StreamReader reader = new StreamReader(fi.ToString(),Encoding.ASCII);
+                        string content;
                         while ((content = reader.ReadLine()) != null)
-                            show_Result(content);
+                        {
+                            content = content.Trim().ToString();
+                            string[] s = content.Split('#', '$');
+                            show_Result(s);
+                        }
+                        reader.Close();
                     }
                 }
             }catch(Exception ex)
