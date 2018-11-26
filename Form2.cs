@@ -99,16 +99,18 @@ namespace WindowsFormsChatter
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int chat_room_number = int.Parse(this.comboBox1.Text.Substring//获取房间号
+            int chat_room_number = int.Parse(this.comboBox1. Text.Substring//获取房间号
                 (this.comboBox1.Text.Length - 1, 1));
             ColumnHeader clh = new ColumnHeader();
-            clh.Text = "聊天室" + chat_room_number.ToString();
+            clh.Text = "欢迎进入聊天室";
             clh.Width = 220;
             listView1.Columns.Add(clh);
             try
             {
-                if (!Directory.Exists(@".\ChatLog"))//第一次时要先创建文件夹
+                if (!Directory.Exists(@".\ChatLog"))
+                {//第一次时要先创建文件夹
                     Directory.CreateDirectory(@".\ChatLog");
+                }
                 else
                 {
                     FileInfo fi = new FileInfo(@".\ChatLog\Chat_Room_" +
@@ -125,7 +127,7 @@ namespace WindowsFormsChatter
                         StreamReader reader = new StreamReader(fi.OpenRead(),
                             UnicodeEncoding.GetEncoding("utf-16"));
                         string content = string.Empty;
-                        while((content = reader.ReadLine()) != null)
+                        while ((content = reader.ReadLine()) != null)
                             show_Result(content);
                     }
                 }
