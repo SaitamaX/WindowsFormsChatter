@@ -17,16 +17,19 @@ using System.Net;
 eg:  "#0$127.0.0.1$hello world#"
 
 ******************/
+
+//聊天记录文件访问冲突，编码问题，服务器功能     进度线
 namespace WindowsFormsChatter
 {
     public partial class Form2 : Form
     {
         int counter = 0;//统计消息条数
-        int room_number;//所在房间
+        int room_number = -1;//所在房间
         Socket client;
         public Form2(object obj)
         {
             client = obj as Socket;
+            Control.CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
         }
         private void show_Result(string [] s)
@@ -48,6 +51,7 @@ namespace WindowsFormsChatter
             }
             else
             {
+                
                 IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
                 byte[] buffer = Encoding.ASCII.GetBytes("#1$" + client_ip.Address.ToString()
                     + "$" + textBox1.Text + "#");
@@ -67,32 +71,34 @@ namespace WindowsFormsChatter
                 StreamWriter writer = new StreamWriter(fi.ToString(),true);
                 writer.WriteLine("#1$" + client_ip.Address.ToString() + "$" + textBox1.Text + "#");
                 writer.Close();
+                if (textBox1.Text != "")//发送消息后清空输入
+                    textBox1.Text = "";
             }
             //将聊天内容通过服务器发送给在同一聊天室的其他客户端
         }
 
 
-        private delegate int myDelegate(ComboBox combox);
+        //private delegate int myDelegate(ComboBox combox);
 
-        private int get_Number(ComboBox combox) {
-            if (combox.InvokeRequired)
-            {
-                myDelegate md = new myDelegate(this.get_Number);
-                this.Invoke(md, new object[] { combox });
-            }
-            else {
-                if (comboBox1.Text == "")
-                {//未选择聊天室时不接收信息
-                    return -1;
-                }
-                else
-                {
-                    room_number = int.Parse(this.comboBox1.Text.Substring(comboBox1.Text.Length - 1, 1));
-                    return room_number;
-                }
-            }
-            return -1;
-        }
+        //private int get_Number(ComboBox combox) {
+        //    if (combox.InvokeRequired)
+        //    {
+        //        myDelegate md = new myDelegate(this.get_Number);
+        //        this.Invoke(md, new object[] { combox });
+        //    }
+        //    else {
+        //        if (comboBox1.Text == "")
+        //        {//未选择聊天室时不接收信息
+        //            return -1;
+        //        }
+        //        else
+        //        {
+        //            room_number = int.Parse(this.comboBox1.Text.Substring(comboBox1.Text.Length - 1, 1));
+        //            return room_number;
+        //        }
+        //    }
+        //    return -1;
+        //}
 
 
         public void receive_Msg()
@@ -102,13 +108,19 @@ namespace WindowsFormsChatter
             {
                 try
                 {
-                    if (get_Number(comboBox1) == -1) {
+                    //if (get_Number(comboBox1) == -1) {//无法跳出此处 
+                    //    continue;
+                    //}
+                    if (room_number == -1)//未选择房间，此时不接收消息
                         continue;
-                    }
                     byte[] buffer = new byte[1024 * 1024];
                     int n = client.Receive(buffer);
+                    System.Console.WriteLine(n);
                     string content = Encoding.ASCII.GetString(buffer, 0, n);
-                    content = content.Trim().ToString();
+                    System.Console.WriteLine(content);
+                    string[] temp = content.Split('\0');
+                    content = temp[0];
+                    System.Console.WriteLine(content);
                     string[] s = content.Split('#', '$');
                     show_Result(s);//显示接收的消息
                     if (!Directory.Exists(@".\ChatLog"))//存放该条内容到聊天记录中
