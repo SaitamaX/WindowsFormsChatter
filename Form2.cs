@@ -51,12 +51,11 @@ namespace WindowsFormsChatter
             }
             else
             {
-                
                 IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
-                byte[] buffer = Encoding.Unicode.GetBytes("#1$" + client_ip.Address.ToString()
+                byte[] buffer = Encoding.Unicode.GetBytes("#0$" + client_ip.ToString()
                     + "$" + textBox1.Text + "#");
                 client.Send(buffer);
-                string content = "#1$" + client_ip.Address.ToString()
+                string content = "#1$" + client_ip.ToString()
                     + "$" + textBox1.Text + "#";
                 string[] s = content.Split('#', '$');
                 show_Result(s);
@@ -69,7 +68,7 @@ namespace WindowsFormsChatter
                     fi.Create().Close();
                 }
                 StreamWriter writer = new StreamWriter(fi.ToString(), true, Encoding.Unicode);
-                writer.WriteLine("#1$" + client_ip.Address.ToString() + "$" + textBox1.Text + "#");
+                writer.WriteLine("#0$" + client_ip.ToString() + "$" + textBox1.Text + "#");
                 writer.Flush();
                 writer.Close();
                 if (textBox1.Text != "")//发送消息后清空输入
@@ -157,7 +156,7 @@ namespace WindowsFormsChatter
             room_number = int.Parse(this.comboBox1.Text.Substring//获取房间号
                 (this.comboBox1.Text.Length - 1, 1));
             IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
-            byte[] buffer = Encoding.Unicode.GetBytes("#0$" + client_ip.Address.ToString()
+            byte[] buffer = Encoding.Unicode.GetBytes("#1$" + client_ip.ToString()
                 + "$" + room_number.ToString() + "#");
             client.Send(buffer);
             //变更了聊天室应先将聊天室信息发送给服务器
