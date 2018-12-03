@@ -41,6 +41,7 @@ namespace WindowsFormsChatter
             lvi.Text = s[s.Length - 2];
             lvi.Group = listView1.Groups[counter++];
             listView1.Items.Add(lvi);
+            listView1.EnsureVisible(counter - 1);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -51,7 +52,7 @@ namespace WindowsFormsChatter
             }
             else
             {
-                IPEndPoint client_ip = (IPEndPoint)client.RemoteEndPoint;
+                IPEndPoint client_ip = (IPEndPoint)client.LocalEndPoint;
                 byte[] buffer = Encoding.Unicode.GetBytes("#0$" + client_ip.ToString()
                     + "$" + textBox1.Text + "#");
                 client.Send(buffer);
@@ -199,6 +200,20 @@ namespace WindowsFormsChatter
                 System.Console.WriteLine(ex.Message);
             }
             //读取对应聊天室的聊天记录文件
+        }
+
+        void Form2_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show(
+                    "是否要退出客户端",
+                    "提示",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Question) != DialogResult.OK)
+            {
+                e.Cancel = true;
+                System.Environment.Exit(0);
+                return;
+            }
         }
     }
 }

@@ -41,10 +41,10 @@ namespace WindowsFormsChatter
             // 
             this.listView1.Location = new System.Drawing.Point(69, 79);
             this.listView1.Name = "listView1";
-            this.listView1.View = View.Details;
             this.listView1.Size = new System.Drawing.Size(229, 268);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
             // 
             // comboBox1
             // 
@@ -70,13 +70,13 @@ namespace WindowsFormsChatter
             // 
             // button1
             // 
+            this.button1.Enabled = false;
             this.button1.Location = new System.Drawing.Point(244, 353);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(54, 23);
             this.button1.TabIndex = 3;
             this.button1.Text = "发送";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Enabled = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
@@ -104,7 +104,7 @@ namespace WindowsFormsChatter
             this.Text = "Chatter";
             this.ResumeLayout(false);
             this.PerformLayout();
-
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form2_FormClosing);
         }
 
         #endregion

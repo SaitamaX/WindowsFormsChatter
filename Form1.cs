@@ -40,5 +40,18 @@ namespace WindowsFormsChatter
                 MessageBox.Show("未能连接服务器,错误信息如下：\r\n" + ex.Message,"Error");
             }
         }
+        void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show(
+                    "是否要退出客户端",
+                    "提示",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Question) != DialogResult.OK)
+            {
+                e.Cancel = true;
+                System.Environment.Exit(0);
+                return;
+            }
+        }
     }
 }
