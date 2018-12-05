@@ -138,8 +138,8 @@ namespace WindowsFormsChatter
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
-                    break;
+                    MessageBox.Show("服务器断开了连接，客户端即将退出");
+                    System.Environment.Exit(0);
                 }
             }
         }
@@ -208,11 +208,13 @@ namespace WindowsFormsChatter
                     "是否要退出客户端",
                     "提示",
                     MessageBoxButtons.OKCancel,
-                    MessageBoxIcon.Question) != DialogResult.OK)
+                    MessageBoxIcon.Question) != DialogResult.Cancel)
+            {
+                System.Environment.Exit(0);
+            }
+            else
             {
                 e.Cancel = true;
-                System.Environment.Exit(0);
-                return;
             }
         }
     }
